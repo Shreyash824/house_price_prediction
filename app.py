@@ -1,10 +1,21 @@
 import streamlit as st
 import pickle
 import numpy as np
+from pathlib import Path
 
-# 1. Load the saved model
-with open('house_price_model.pkl', 'rb') as file:
-    model = pickle.load(file)
+# 1. Load the saved model from the app directory
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / 'house_price_model.pkl'
+if not MODEL_PATH.exists():
+    st.error(f"Model file not found: {MODEL_PATH}\nPlease place house_price_model.pkl in the same folder as app.py.")
+    st.stop()
+
+try:
+    with open(MODEL_PATH, 'rb') as file:
+        model = pickle.load(file)
+except Exception as e:
+    st.error(f"Failed to load model: {e}")
+    st.stop()
 
 # 2. Configure App Header
 st.set_page_config(page_title="House Price Predictor", page_icon="🏡", layout="centered")
@@ -38,3 +49,4 @@ if st.button("💰 Calculate Estimated Price", type="primary"):
         
     # Display Result
     st.success(f"### Estimated Market Price: **₹ {predicted_price:.2f} Lakhs**")
+  
